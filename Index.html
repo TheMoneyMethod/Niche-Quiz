@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Your People - Niche Finder Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --gold: #D4AF37;
+            --gold-dark: #B8941C;
+            --gold-light: #F0D469;
+            --black: #0A0A0A;
+            --black-light: #1A1A1A;
+            --white: #FAFAFA;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background: linear-gradient(135deg, var(--black) 0%, var(--black-light) 100%);
+            color: var(--white);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(212, 175, 55, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            color: var(--gold);
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .quiz-card {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--gold);
+            border-radius: 20px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 60px rgba(212, 175, 55, 0.2);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .intro-section, .question-section, .results-section {
+            display: none;
+        }
+
+        .intro-section.active, .question-section.active, .results-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--gold);
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            color: var(--gold-light);
+        }
+
+        p {
+            line-height: 1.8;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            color: rgba(250, 250, 250, 0.9);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(212, 175, 55, 0.2);
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 100%);
+            width: 0%;
+            transition: width 0.5s ease-out;
+            box-shadow: 0 0 10px var(--gold);
+        }
+
+        .progress-text {
+            text-align: center;
+            color: var(--gold);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            color: var(--white);
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            background: rgba(212, 175, 55, 0.05);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            padding: 20px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .option:hover {
+            background: rgba(212, 175, 55, 0.15);
+            border-color: var(--gold);
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: var(--gold);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+            color: var(--black);
+            border: none;
+            padding: 18px 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Lato', sans-serif;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .result-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+
+        .result-subtitle {
+            font-size: 1.2rem;
+            color: var(--gold-light);
+            font-weight: 300;
+        }
+
+        .result-section {
+            margin-bottom: 35px;
+            padding-bottom: 35px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .result-section:last-of-type {
+            border-bottom: none;
+        }
+
+        .result-section h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold-light);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .result-section ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .result-section li {
+            padding-left: 25px;
+            margin-bottom: 12px;
+            position: relative;
+            line-height: 1.7;
+        }
+
+        .result-section li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        .product-ideas {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .product-card {
+            background: rgba(212, 175, 55, 0.08);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 3px solid var(--gold);
+        }
+
+        .product-card h4 {
+            color: var(--gold);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .next-steps {
+            background: rgba(212, 175, 55, 0.1);
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .quiz-card {
+                padding: 35px 25px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+
+            .question-text {
+                font-size: 1.1rem;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 15px 30px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">The Digital Method</div>
+            <div class="tagline">Find Your People</div>
+        </div>
+
+        <div class="quiz-card">
+            <!-- Intro Section -->
+            <div class="intro-section active">
+                <h1>Who Should You Create For?</h1>
+                <p>The secret to creating digital products people actually want? Start with people you already understand. This quick quiz helps you figure out who those people are.</p>
+                <p>In just 5 minutes, you'll find out:</p>
+                <ul style="list-style: none; margin: 20px 0;">
+                    <li style="padding-left: 25px; margin-bottom: 12px; position: relative;">
+                        <span style="position: absolute; left: 0; color: var(--gold);">✓</span>
+                        Who you can help (based on your real-life experience)
+                    </li>
+                    <li style="padding-left: 25px; margin-bottom: 12px; position: relative;">
+                        <span style="position: absolute; left: 0; color: var(--gold);">✓</span>
+                        What problems you can solve for them
+                    </li>
+                    <li style="padding-left: 25px; margin-bottom: 12px; position: relative;">
+                        <span style="position: absolute; left: 0; color: var(--gold);">✓</span>
+                        Ideas for what to create
+                    </li>
+                    <li style="padding-left: 25px; margin-bottom: 12px; position: relative;">
+                        <span style="position: absolute; left: 0; color: var(--gold);">✓</span>
+                        Simple first steps to get started
+                    </li>
+                </ul>
+                <button class="btn" onclick="startQuiz()">Start Quiz</button>
+            </div>
+
+            <!-- Question Section -->
+            <div class="question-section">
+                <div class="progress-text">Question <span id="current-q">1</span> of <span id="total-q">8</span></div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress"></div>
+                </div>
+                <div class="question-text" id="question-text"></div>
+                <div class="options" id="options"></div>
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousQuestion()" id="prev-btn" style="display: none;">Previous</button>
+                    <button class="btn" onclick="nextQuestion()" id="next-btn" disabled>Next</button>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section">
+                <div class="result-header">
+                    <div class="result-title" id="result-title"></div>
+                    <div class="result-subtitle" id="result-subtitle"></div>
+                </div>
+                <div id="result-content"></div>
+                <div class="button-group">
+                    <button class="btn" onclick="location.reload()">Take Quiz Again</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                id: 1,
+                text: "What describes your current situation best?",
+                options: [
+                    { text: "I have a full-time job and dream of doing my own thing", value: "transition", scores: { career: 3, parent: 1, health: 1, business: 2, creative: 1 } },
+                    { text: "I'm freelancing or consulting and want to work less, earn more", value: "freelance", scores: { business: 3, career: 2, creative: 2, parent: 1, health: 1 } },
+                    { text: "I create content and want to make money from it", value: "creator", scores: { creative: 3, business: 2, career: 1, parent: 1, health: 1 } },
+                    { text: "I'm brand new to all of this", value: "fresh", scores: { career: 2, business: 2, creative: 2, parent: 2, health: 2 } },
+                    { text: "I have experience or skills from my past I could use", value: "expert", scores: { career: 2, parent: 2, health: 2, business: 2, creative: 1 } }
+                ]
+            },
+            {
+                id: 2,
+                text: "Which group of people do you really 'get' because you've been there?",
+                options: [
+                    { text: "New parents trying to figure it all out", value: "parents", scores: { parent: 4, health: 1, career: 1, business: 1, creative: 1 } },
+                    { text: "People wanting to change careers or find a better job", value: "careers", scores: { career: 4, business: 2, creative: 1, parent: 1, health: 1 } },
+                    { text: "Small business owners trying to make it work", value: "business", scores: { business: 4, career: 2, creative: 2, parent: 1, health: 1 } },
+                    { text: "People struggling with their health or energy", value: "health", scores: { health: 4, parent: 2, career: 1, business: 1, creative: 1 } },
+                    { text: "Hobbyists who want to turn their passion into income", value: "creative", scores: { creative: 4, business: 2, career: 2, parent: 1, health: 1 } }
+                ]
+            },
+            {
+                id: 3,
+                text: "What's something you figured out that friends or family ask you about?",
+                options: [
+                    { text: "How to avoid burnout and find better work-life balance", value: "burnout", scores: { career: 3, health: 2, parent: 2, business: 1, creative: 1 } },
+                    { text: "How to learn a new skill and get good at it", value: "skill", scores: { creative: 3, career: 2, business: 2, parent: 1, health: 1 } },
+                    { text: "Getting healthier, fitter, or feeling better", value: "fitness", scores: { health: 4, parent: 2, career: 1, business: 1, creative: 1 } },
+                    { text: "Getting through a big life change (new baby, divorce, loss, etc.)", value: "life", scores: { parent: 4, health: 2, career: 2, business: 1, creative: 1 } },
+                    { text: "Starting or growing a business or side hustle", value: "hustle", scores: { business: 4, career: 2, creative: 2, parent: 1, health: 1 } }
+                ]
+            },
+            {
+                id: 4,
+                text: "When you see people struggling, which problems really tug at your heart?",
+                options: [
+                    { text: "Parents who are overwhelmed and exhausted", value: "parent-struggle", scores: { parent: 3, health: 1, career: 1, business: 1, creative: 1 } },
+                    { text: "People stuck in jobs they hate", value: "career-struggle", scores: { career: 3, business: 1, creative: 1, parent: 1, health: 1 } },
+                    { text: "People trying to start a business but not getting anywhere", value: "biz-struggle", scores: { business: 3, career: 1, creative: 2, parent: 1, health: 1 } },
+                    { text: "People tired all the time or unhappy with their health", value: "health-struggle", scores: { health: 3, parent: 2, career: 1, business: 1, creative: 1 } },
+                    { text: "Creative people too scared to share their work or charge for it", value: "creative-struggle", scores: { creative: 3, business: 2, career: 1, parent: 1, health: 1 } }
+                ]
+            },
+            {
+                id: 5,
+                text: "When you're on Facebook or Instagram, what problems make you think 'I know how to help with that!'?",
+                options: [
+                    { text: "Never having enough time and feeling behind", value: "time", scores: { career: 2, parent: 3, business: 2, health: 1, creative: 1 } },
+                    { text: "Lacking confidence or feeling stuck mentally", value: "mindset", scores: { career: 3, creative: 2, business: 2, parent: 1, health: 1 } },
+                    { text: "Not knowing how to do something they want to learn", value: "skills", scores: { creative: 3, career: 2, business: 2, parent: 1, health: 1 } },
+                    { text: "Struggling to take care of themselves", value: "balance", scores: { health: 3, parent: 3, career: 2, business: 1, creative: 1 } },
+                    { text: "Confused about how to get customers or make sales", value: "strategy", scores: { business: 3, career: 2, creative: 2, parent: 1, health: 1 } }
+                ]
+            },
+            {
+                id: 6,
+                text: "Which group do you see actually spending money to fix their problems?",
+                options: [
+                    { text: "Parents buying parenting books, courses, or asking for help", value: "parent-search", scores: { parent: 3, health: 1, career: 1, business: 1, creative: 1 } },
+                    { text: "People paying for career coaches or resume help", value: "career-search", scores: { career: 3, business: 1, creative: 1, parent: 1, health: 1 } },
+                    { text: "Business owners buying courses or hiring consultants", value: "biz-search", scores: { business: 3, career: 2, creative: 1, parent: 1, health: 1 } },
+                    { text: "People joining gyms, buying meal plans, or hiring trainers", value: "health-search", scores: { health: 3, parent: 2, career: 1, business: 1, creative: 1 } },
+                    { text: "Creatives taking classes or buying tools to get better", value: "creative-search", scores: { creative: 3, business: 2, career: 1, parent: 1, health: 1 } }
+                ]
+            },
+            {
+                id: 7,
+                text: "Who do you already know or have connections to?",
+                options: [
+                    { text: "Other parents in my life or community", value: "parent-access", scores: { parent: 3, health: 1, career: 1, business: 1, creative: 1 } },
+                    { text: "People I've worked with or know from my job/industry", value: "career-access", scores: { career: 3, business: 2, creative: 1, parent: 1, health: 1 } },
+                    { text: "Business owners or entrepreneurs", value: "biz-access", scores: { business: 3, career: 2, creative: 2, parent: 1, health: 1 } },
+                    { text: "People interested in health, fitness, or feeling better", value: "health-access", scores: { health: 3, parent: 2, career: 1, business: 1, creative: 1 } },
+                    { text: "Other creative people or artists", value: "creative-access", scores: { creative: 3, business: 1, career: 1, parent: 1, health: 1 } }
+                ]
+            },
+            {
+                id: 8,
+                text: "What kind of difference do you want to make in people's lives?",
+                options: [
+                    { text: "Help parents feel less stressed and more confident", value: "parent-impact", scores: { parent: 4, health: 1, career: 1, business: 1, creative: 1 } },
+                    { text: "Help people find work they actually enjoy", value: "career-impact", scores: { career: 4, business: 1, creative: 1, parent: 1, health: 1 } },
+                    { text: "Help people build businesses that actually make money", value: "biz-impact", scores: { business: 4, career: 2, creative: 2, parent: 1, health: 1 } },
+                    { text: "Help people feel healthier and have more energy", value: "health-impact", scores: { health: 4, parent: 2, career: 1, business: 1, creative: 1 } },
+                    { text: "Help creative people share their talents with the world", value: "creative-impact", scores: { creative: 4, business: 2, career: 1, parent: 1, health: 1 } }
+                ]
+            }
+        ];
+
+        const results = {
+            career: {
+                title: "You Should Help: Career Changers",
+                subtitle: "People who want to find work they actually love",
+                description: "You can help people who feel stuck in jobs that make them miserable but don't know how to change without risking everything.",
+                painPoints: [
+                    "Make good money but hate their job",
+                    "Don't know what else they could do",
+                    "Scared to start over or earn less money",
+                    "Feel like a fraud switching careers",
+                    "Need a step-by-step plan they can follow"
+                ],
+                whyYou: "You've been through this yourself or helped others do it. You know it's scary AND you know the exact steps to take.",
+                products: [
+                    {
+                        name: "Career Change Roadmap",
+                        description: "Simple steps to explore new careers while keeping your current job"
+                    },
+                    {
+                        name: "LinkedIn Profile Makeover Guide",
+                        description: "How to update your LinkedIn when you're changing industries"
+                    },
+                    {
+                        name: "Find Your Dream Job Workbook",
+                        description: "Questions to help figure out what you actually want to do"
+                    },
+                    {
+                        name: "Career Change Interview Guide",
+                        description: "What to say when they ask why you're switching careers"
+                    }
+                ],
+                nextSteps: [
+                    "Ask 5 people who changed careers: 'What was the hardest part?'",
+                    "Join a Facebook group about career changes and just read posts for a week",
+                    "Google 'how to change careers' and see what questions people are asking",
+                    "Post on social media: 'Thinking about helping career changers. What's your biggest fear about switching jobs?'"
+                ]
+            },
+            parent: {
+                title: "You Should Help: Parents",
+                subtitle: "Parents who feel overwhelmed and want to feel more confident",
+                description: "You can help exhausted parents who love their kids but feel like they're drowning and constantly wondering if they're doing it right.",
+                painPoints: [
+                    "Always second-guessing if they're doing things right",
+                    "Too much advice from everyone and it all conflicts",
+                    "Trying to balance parenting with everything else in life",
+                    "Feel alone like they're the only one struggling",
+                    "Want to be a good parent but running on empty"
+                ],
+                whyYou: "You've been there in the trenches of parenting, or you've helped other parents through it. You know what actually works in real life (not just in theory).",
+                products: [
+                    {
+                        name: "The Confident Parent Guide",
+                        description: "Simple ways to make decisions without second-guessing everything"
+                    },
+                    {
+                        name: "Routines That Actually Work",
+                        description: "Daily schedules for busy parents (that you can actually stick to)"
+                    },
+                    {
+                        name: "Self-Care for Exhausted Parents",
+                        description: "Ways to take care of yourself when you have zero extra time"
+                    },
+                    {
+                        name: "Age-by-Age Parent Guides",
+                        description: "What to expect and how to handle each stage (baby, toddler, teen)"
+                    }
+                ],
+                nextSteps: [
+                    "Ask 5 parents: 'What's the hardest part of parenting for you right now?'",
+                    "Join some parenting Facebook groups and see what questions come up over and over",
+                    "Look at parenting Instagram accounts - read the comments to see what people struggle with",
+                    "Share your story: 'Here's what I wish someone told me when I became a parent...'"
+                ]
+            },
+            business: {
+                title: "You Should Help: Small Business Owners",
+                subtitle: "People trying to make their business work without burning out",
+                description: "You can help small business owners and side hustlers who are doing ALL the things but barely making money and need help building something that actually works.",
+                painPoints: [
+                    "Doing everything themselves and totally exhausted",
+                    "Money coming in is all over the place - some months good, some terrible",
+                    "Don't know how to get customers without feeling pushy",
+                    "Too much advice out there and confused about what to do first",
+                    "Want to grow but have no idea where to start"
+                ],
+                whyYou: "You've built a business yourself or helped others do it. You know what actually works (and what's just hype).",
+                products: [
+                    {
+                        name: "Build a Business That Runs Itself",
+                        description: "How to set up systems so you're not doing everything yourself"
+                    },
+                    {
+                        name: "Price It Right Guide",
+                        description: "Figure out what to charge so you actually make money"
+                    },
+                    {
+                        name: "Marketing Made Simple",
+                        description: "Get customers without feeling sleazy or spending all day on social media"
+                    },
+                    {
+                        name: "Money Tracking Spreadsheet",
+                        description: "Simple templates to know if you're actually making a profit"
+                    }
+                ],
+                nextSteps: [
+                    "Ask 5 business owners: 'What's stopping you from growing right now?'",
+                    "Join entrepreneur Facebook groups and see what people are stuck on",
+                    "Look at business courses on Udemy or Skillshare - what's missing?",
+                    "Share: 'The one thing that changed everything for my business was...'"
+                ]
+            },
+            health: {
+                title: "You Should Help: People Wanting Better Health",
+                subtitle: "People tired of feeling tired and ready for real change",
+                description: "You can help people frustrated with their health or energy who've tried a million things that didn't work and are ready for something that actually fits their life.",
+                painPoints: [
+                    "Tried every diet and nothing ever sticks",
+                    "Too busy and tired for complicated health routines",
+                    "Confused by all the conflicting health advice",
+                    "Want results without extreme diets or crazy workouts",
+                    "Feel like their body is against them"
+                ],
+                whyYou: "You've figured out health and wellness in a way that actually works for real life, not just in perfect conditions.",
+                products: [
+                    {
+                        name: "30-Day Healthy Habits Reset",
+                        description: "Build simple habits that actually stick (no restrictive diets)"
+                    },
+                    {
+                        name: "Get Your Energy Back Guide",
+                        description: "Feel better without crazy supplements or extreme measures"
+                    },
+                    {
+                        name: "Meal Plans for Busy People",
+                        description: "Healthy eating that doesn't take hours to prep"
+                    },
+                    {
+                        name: "Exercise That Fits Your Life",
+                        description: "Ways to move your body that don't require a gym membership"
+                    }
+                ],
+                nextSteps: [
+                    "Ask 5 people: 'What's stopped you from getting healthier?'",
+                    "Join health/fitness Facebook groups and see what frustrates people",
+                    "Read reviews of popular diet programs - what do people complain about?",
+                    "Share your story: 'Here's what finally worked for me after trying everything...'"
+                ]
+            },
+            creative: {
+                title: "You Should Help: Creative People",
+                subtitle: "Creatives who want to share their work and get paid for it",
+                description: "You can help talented creative people who are good at what they do but too scared to put themselves out there or charge what they're worth.",
+                painPoints: [
+                    "Think their work isn't good enough to share or sell",
+                    "Have no idea what to charge",
+                    "Can't seem to create consistently",
+                    "Scared of what people will think",
+                    "Want to make money without feeling like a sellout"
+                ],
+                whyYou: "You've gone from hobby to professional creative yourself. You know the creative side AND the business side.",
+                products: [
+                    {
+                        name: "Creative Confidence Course",
+                        description: "Get over the fear and share your work with pride"
+                    },
+                    {
+                        name: "Price Your Work Guide",
+                        description: "Figure out what to charge without feeling guilty"
+                    },
+                    {
+                        name: "Create Consistently System",
+                        description: "Simple habits to keep creating even when life gets busy"
+                    },
+                    {
+                        name: "Portfolio Builder Kit",
+                        description: "How to show off your best work (even if you hate self-promotion)"
+                    }
+                ],
+                nextSteps: [
+                    "Ask 5 creative people: 'What's holding you back from going pro?'",
+                    "Join creative Facebook groups or Reddit communities and see what people struggle with",
+                    "Look at successful creatives in your field - what are they teaching?",
+                    "Share: 'The mindset shift that changed my creative life...'"
+                ]
+            }
+        };
+
+        let currentQuestion = 0;
+        let answers = [];
+        let scores = { career: 0, parent: 0, business: 0, health: 0, creative: 0 };
+
+        function startQuiz() {
+            document.querySelector('.intro-section').classList.remove('active');
+            document.querySelector('.question-section').classList.add('active');
+            document.getElementById('total-q').textContent = questions.length;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            document.getElementById('current-q').textContent = currentQuestion + 1;
+            document.getElementById('question-text').textContent = question.text;
+            
+            const progress = ((currentQuestion) / questions.length) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+            
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option.text;
+                optionDiv.onclick = () => selectOption(index);
+                
+                if (answers[currentQuestion] === index) {
+                    optionDiv.classList.add('selected');
+                }
+                
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            document.getElementById('prev-btn').style.display = currentQuestion > 0 ? 'block' : 'none';
+            document.getElementById('next-btn').disabled = answers[currentQuestion] === undefined;
+        }
+
+        function selectOption(index) {
+            answers[currentQuestion] = index;
+            document.querySelectorAll('.option').forEach((opt, i) => {
+                opt.classList.toggle('selected', i === index);
+            });
+            document.getElementById('next-btn').disabled = false;
+        }
+
+        function nextQuestion() {
+            const question = questions[currentQuestion];
+            const selectedOption = question.options[answers[currentQuestion]];
+            
+            // Add scores
+            Object.keys(selectedOption.scores).forEach(key => {
+                scores[key] += selectedOption.scores[key];
+            });
+            
+            currentQuestion++;
+            
+            if (currentQuestion < questions.length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                const question = questions[currentQuestion - 1];
+                const selectedOption = question.options[answers[currentQuestion - 1]];
+                
+                // Subtract scores
+                Object.keys(selectedOption.scores).forEach(key => {
+                    scores[key] -= selectedOption.scores[key];
+                });
+                
+                currentQuestion--;
+                showQuestion();
+            }
+        }
+
+        function showResults() {
+            // Find highest score
+            let topNiche = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+            const result = results[topNiche];
+            
+            document.querySelector('.question-section').classList.remove('active');
+            document.querySelector('.results-section').classList.add('active');
+            
+            document.getElementById('result-title').textContent = result.title;
+            document.getElementById('result-subtitle').textContent = result.subtitle;
+            
+            let contentHTML = `
+                <p style="font-size: 1.15rem; line-height: 1.8; margin-bottom: 30px;">${result.description}</p>
+                
+                <div class="result-section">
+                    <h3>What They Struggle With:</h3>
+                    <ul>
+                        ${result.painPoints.map(point => `<li>${point}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <div class="result-section">
+                    <h3>Why You're Perfect to Help:</h3>
+                    <p>${result.whyYou}</p>
+                </div>
+                
+                <div class="result-section">
+                    <h3>What You Could Create For Them:</h3>
+                    <div class="product-ideas">
+                        ${result.products.map(product => `
+                            <div class="product-card">
+                                <h4>${product.name}</h4>
+                                <p style="margin: 0; font-size: 0.95rem; color: rgba(250, 250, 250, 0.8);">${product.description}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div class="result-section">
+                    <h3>How to Get Started (Do These 4 Things):</h3>
+                    <div class="next-steps">
+                        <ul>
+                            ${result.nextSteps.map(step => `<li>${step}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(212, 175, 55, 0.15); padding: 25px; border-radius: 12px; margin-top: 30px; border-left: 4px solid var(--gold);">
+                    <p style="margin: 0; font-size: 1.05rem;"><strong style="color: var(--gold);">Remember:</strong> You don't need to be an expert at everything - just know more than the people you're helping. Start by having real conversations with people, find out what they actually need help with, and go from there. You've got this!</p>
+                </div>
+            `;
+            
+            document.getElementById('result-content').innerHTML = contentHTML;
+        }
+    </script>
+</body>
+</html>
